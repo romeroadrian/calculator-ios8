@@ -13,6 +13,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var display: UILabel!
     
     var middleOfNumber = false
+    var calculator = Calculator()
     
     @IBAction func appendDigit(sender: UIButton) {
         let digit = sender.currentTitle!
@@ -24,41 +25,26 @@ class ViewController: UIViewController {
         }
         println("digit = \(digit)")
     }
-
-    var operatorStack = Array<Double>()
     
     @IBAction func enter() {
         middleOfNumber = false
-        operatorStack.append(displayValue)
-        print("operatorStack = \(operatorStack)")
+        if let result = calculator.pushOperand(displayValue) {
+            displayValue = result
+        } else {
+            displayValue = 0
+        }
     }
     
     @IBAction func operate(sender: UIButton) {
-        let operation = sender.currentTitle!
         if middleOfNumber {
             enter()
         }
-        switch operation {
-            case "x": performOperation {$0 * $1}
-            case "/": performOperation {$1 / $0}
-            case "+": performOperation {$0 + $1}
-            case "-": performOperation {$1 - $0}
-            case "S": performOperation {sqrt($0)}
-            default: break
-        }
-    }
-    
-    func performOperation(operation: (Double, Double) -> Double) {
-        if operatorStack.count >= 2 {
-            displayValue = operation(operatorStack.removeLast(), operatorStack.removeLast())
-            enter()
-        }
-    }
-    
-    func performOperation(operation: Double -> Double) {
-        if operatorStack.count >= 1 {
-            displayValue = operation(operatorStack.removeLast())
-            enter()
+        if let operation = sender.currentTitle {
+            if let result = calculator.performOperation(operation) {
+                displayValue = result
+            } else {
+                displayValue = 0
+            }
         }
     }
     
@@ -71,17 +57,6 @@ class ViewController: UIViewController {
             middleOfNumber = false
         }
     }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
 
 }
 
